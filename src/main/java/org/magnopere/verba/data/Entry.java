@@ -153,13 +153,15 @@ public class Entry {
 
     @Override
     public String toString() {
-        return String.format("%d. %s [%s] %s; %s %s%n\t%s%n",
-                getOrdinality(),
-                getLemma(),
-                getOrthography(),
-                getEndings(),
-                getPos(),
-                getGender(),
+        return String.format("<em>%s%s%s%s</em><p>%s</p>",
+                pad(getOrthography()),
+                pad(getEndings()),
+                pad(getPos()),
+                pad(getGender()),
                 getDefinition());
+    }
+    
+    private static String pad(String s){
+        return s == null || s.length() == 0 ? "" : s + " ";
     }
 }

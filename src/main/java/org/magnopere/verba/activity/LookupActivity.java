@@ -27,6 +27,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
@@ -45,6 +48,7 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
     private ArrayAdapter<Analysis>  entryAdapter;
 
     private DBHelper                dbHelper;
+    private MenuHandler             menuHandler;
 
     /**
      * Called when the activity is first created.
@@ -57,14 +61,15 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
         super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
         setContentView(R.layout.main);
-        dbHelper = new DBHelper(this);
+        dbHelper        = new DBHelper(this);
+        menuHandler     = new MenuHandler(this);
         searchBox       = (EditText)findViewById(R.id.search_EditText);
         searchBox.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         searchBox.setOnClickListener(this);
         searchButton    = (Button)findViewById(R.id.search_Button);
         searchButton.setOnClickListener(this);
         candidateList   = (ListView)findViewById(R.id.candidateEntries_ListView);
-        entryAdapter = new ArrayAdapter<Analysis>(this, R.layout.candidate_entry_list);
+        entryAdapter    = new ArrayAdapter<Analysis>(this, R.layout.candidate_entry_list);
         candidateList.setAdapter(entryAdapter);
         candidateList.setOnItemClickListener(this);
     }
@@ -113,15 +118,32 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
         searchBox.getText().clear();
         entryAdapter.clear();
     }
-    
+
     private void searchButtonClicked(Button searchButton){
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchBox.getWindowToken(), 0);
-        final String form = searchBox.getText().toString().trim().toLowerCase();
-        for (Analysis analysis: dbHelper.findAnalyses(form)){
-            entryAdapter.add(analysis);
+        final String searchInput = searchBox.getText().toString().trim().toLowerCase();
+        entryAdapter.clear();
+        final String[] tokens = searchInput.split("\\s+");
+        for (String token: tokens){
+            for (Analysis analysis: dbHelper.findAnalyses(token)){
+                entryAdapter.add(analysis);
+            }
         }
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return menuHandler.performOnCreateOptionsMenu(menu);
+    }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return menuHandler.performOnOptionsItemSelected(item);
+    }
+    
+    
     
 }
 

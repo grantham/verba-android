@@ -26,5 +26,43 @@
     <string name="searchBox">quod uerbum vīs discere?</string>
     <string name="search">mē docē</string>
     <string name="clear">dele tabellam</string>
-    <string name="noDefinitionsFound">mē paenitet, nam nūllum inuentum est.</string>
+    <string name="resourceNotFound">mē paenitet, nam nūllum inuentum est.</string>
+    <string name="about_label">de uerbis</string>
+    <string name="about">
+        This little application is greatly indebted to the free/libre software and data contributed by the Perseus project. In the same spirit of openness I hope that verba-android can be of use to others.
+        Source is available from https://github.com/grantham/verba-android. Hack away!
+    </string>
+
+    <string name="contribute_label">Hack</string>
+    <string name="contribute">
+       Hack away! Source is available from https://github.com/grantham/verba-android
+    </string>
+    <string name="about_licensing_label">Licensing</string>
+    <string name="about_licensing">
+Verba-Android is released under the GPL v3 license and is based on the database produced by the Verba-Console project (see http://www.magnopere.org/index.html#verba-console)\n
+\n
+The underlying data in this database comes from two sources:\n
+\n
+1. An Elementary Latin Dictionary (1895) by Charlton T. Lewis (see http://www.archive.org/details/anelementarylat01lewigoog).  This work is in the public domain, but was encoded into TEI by the Tufts University Perseus Project (http://www.perseus.tufts.edu) and the TEI-encoded XML file is released under the Creative Commons ShareAlike 3.0 License (http://creativecommons.org/licenses/by-sa/3.0/us/). I understand the copyright claim can only pertain to the XML encoding the project provided and cannot extend to the underlying work which is already in the public domain.\n
+\n
+2. A Latin morphology file produced by the Perseus Project (http://www.perseus.tufts.edu), and and which (as far as I can tell) is licensed under Mozilla Public License 1.1 (MPL 1.1) (see http://www.mozilla.org/MPL/MPL-1.1.html)\n
+\n
+Because of its use of the above-mentioned morphology file, the verba-console app is licensed under the Mozilla Public License 1.1 (MPL 1.1) with the option to also license under the GPL. Note that Verba-Android does not use either of the above-mentioned Perseus project files, but rather depends on the output of a program which is licensed in a compatible way to the sources it uses.\n
+\n
+Copyright (c) 2012 Roger Grantham\n
+\n
+All rights reserved.\n
+\n
+Verba-Android is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n
+\n
+Verba-Android is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n
+\n
+You should have received a copy of the GNU General Public License along with Verba-Android.  If not, see http://www.gnu.org/licenses/\n
+    </string>
+    <string name="gpl_label">GPL</string>
+    <string name="gpl">
+        GNU GENERAL PUBLIC LICENSE
+        Version 3, 29 June 2007
+        See http://www.gnu.org/licenses/
+    </string>
 </resources>

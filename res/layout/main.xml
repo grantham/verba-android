@@ -27,7 +27,7 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:background="#4fda">
+              android:background="@drawable/cursive">
     <EditText
             android:id="@+id/search_EditText"
             android:layout_width="fill_parent"
@@ -36,17 +36,23 @@
             android:gravity="top"
             android:background="#cfff"
             android:inputType="textNoSuggestions"
-            android:imeOptions="actionDone|actionGo|actionSend"
+            android:imeOptions="actionDone|actionGo|actionSend|actionSearch"
             android:autoText="false"/>
 
-        <Button android:id="@+id/search_Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:text="@string/search" />
+    <Button android:id="@+id/search_Button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/search" />
 
     <ListView android:id="@+id/candidateEntries_ListView"
               android:layout_width="wrap_content"
-              android:layout_height="wrap_content" />
+              android:layout_height="wrap_content"
+              android:background="#9000"/>
 
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="10dp"
+              android:textSize="16sp" >
+    </TextView>
 </LinearLayout>

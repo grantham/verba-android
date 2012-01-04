@@ -13,6 +13,7 @@
       </intent-filter>
     </activity>
       <activity android:name=".activity.ShowDefinitionsActivity"/>
+      <activity android:name=".activity.InformationActivity"/>
   </application>
 
 </manifest>

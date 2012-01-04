@@ -21,11 +21,14 @@
 
 package org.magnopere.verba.activity;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import org.magnopere.verba.R;
 import org.magnopere.verba.data.DBHelper;
 import org.magnopere.verba.data.Entry;
@@ -37,23 +40,31 @@ import java.util.List;
  * @author Roger Grantham
  * @since 1/2/12
  */
-public class ShowDefinitionsActivity extends ListActivity {
+public class ShowDefinitionsActivity extends Activity {
     
     public  static final String ANALYSIS_LEMMA  = "ANALYSIS_LEMMA";
     private static final String TAG             = ShowDefinitionsActivity.class.getSimpleName();
 
+    private ListView                definitionListView;
+    private ArrayAdapter<Spanned>   entryAdapter;
+    private MenuHandler             menuHandler;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.show_definitions);
         final DBHelper dbHelper = new DBHelper(this);
+        menuHandler = new MenuHandler(this);
         final List<Entry> entries = dbHelper.lookup(getLemma());
         final Spanned[] entrySpans = new Spanned[entries.size()];
         for (int i = 0; i < entries.size(); i++){
             entrySpans[i] = Html.fromHtml(entries.get(i).toString());
         }
-        setListAdapter(new ArrayAdapter<Spanned>(this, 
-                                                 R.layout.show_definitions, 
-                                                entrySpans.length == 0 ? getNoDefinitionsError() : entrySpans));
+        definitionListView = (ListView)findViewById(R.id.definitions_ListView);
+        entryAdapter = new ArrayAdapter<Spanned>(this,
+                                                 R.layout.candidate_entry_list,
+                                                 entrySpans.length == 0 ? getNoDefinitionsError() : entrySpans);
+        definitionListView.setAdapter(entryAdapter);
     }
 
     private String getLemma(){
@@ -61,6 +72,19 @@ public class ShowDefinitionsActivity extends ListActivity {
     }
 
      private Spanned[] getNoDefinitionsError(){
-         return new Spanned[]{Html.fromHtml(getResources().getString(R.string.noDefinitionsFound))};
+         return new Spanned[]{Html.fromHtml(getResources().getString(R.string.resourceNotFound))};
      }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return menuHandler.performOnCreateOptionsMenu(menu);
+    }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return menuHandler.performOnOptionsItemSelected(item);
+    }
+
 }
