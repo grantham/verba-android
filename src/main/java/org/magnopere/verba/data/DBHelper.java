@@ -26,7 +26,9 @@ import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.StatFs;
 import android.util.Log;
+import org.magnopere.verba.activity.InstallationListener;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -38,6 +40,12 @@ import static org.magnopere.verba.data.DBConstants.*;
 import static org.magnopere.verba.data.Orthography.*;
 
 /**
+ * Facade to the database. <p>
+ * <strong>NOTA BENE:</strong> after the APK is installed, the first time it is run, the database must be
+ * unpacked from <code>/assets/verba.jpg</code>. Note that <code>/assets/verba.jpg</code> is, in fact a gzipped
+ * SQLite database file! The file extension is a hack to get around a limitation of being able to only unpack <1MB of
+ * non-image data from <code>/assets</code><p>
+ * See also {@linkplain #deployDB(InstallationListener)}
  * @author Roger Grantham
  * @since 12/31/11
  */
@@ -54,14 +62,6 @@ public class DBHelper extends SQLiteOpenHelper {
         this.context = context;
     }
 
-
-    private static float getAvailableMB(File target) {
-        // TODO: make this work
-//        final StatFs statFs = new StatFs(target.getPath());
-//        long availableBytes = (long)statFs.getBlockSize() * (long)statFs.getAvailableBlocks();
-//        return availableBytes / (1024.0f * 1024.0f);
-        return DEFLATED_DB_SIZE * 2.0F;
-    }
 
 
     private void checkDBIsOpen(){
@@ -81,39 +81,36 @@ public class DBHelper extends SQLiteOpenHelper {
      * Deploys the DB from the assets location
      * @throws IOException on error
      */
-    private void deployDB() throws IOException {
-        Log.i(TAG, "deployDB()");
-        final float availableMB = getAvailableMB(DEPLOYED_DB_FILE);
-        if (availableMB < DEFLATED_DB_SIZE){
-            throw new IOException(
-                    String.format("Insufficient space for deflating verb DB; required %fMB, found %fMB",
-                                    DEFLATED_DB_SIZE, availableMB));
-        }
-        Log.i(TAG, "generating tmp DB");
+    public void deployDB(InstallationListener listener) throws IOException {
+        if (DBConstants.DEPLOYED_DB_FILE.exists()) return;
+        listener.started();
         final SQLiteDatabase tmp = getReadableDatabase();
         final String dbPath = tmp.getPath();
-        Log.i(TAG, "tmp DB path: " + dbPath);
         tmp.close();
-        Log.i(TAG, "tmp DB closed");
-        InputStream in = null;
-        OutputStream out = null;
+        GZIPInputStream in = null;
+        OutputStream    out = null;
         try {
-            Log.i(TAG, "copying DB from assets to " + dbPath);
             final AssetManager assetManager = context.getResources().getAssets();
             in  = new GZIPInputStream(assetManager.open(DB_ASSET_NAME, AssetManager.ACCESS_STREAMING));
             out = new FileOutputStream(dbPath);
             byte[] buf = new byte[BUF_SIZE];
-            for (int read = in.read(buf); read > 0; read = in.read(buf)){
+            int totalBytesRead = 0;
+            for (int read = in.read(buf), i = 0; read > 0; read = in.read(buf), i++){
                 out.write(buf, 0, read);
+                totalBytesRead += read;
+                if (i % 100 == 0){
+                    listener.progress(Math.min((double)totalBytesRead / (double)DEFLATED_DB_SIZE_BYTES, 1.0D));
+                }
             }
             out.flush();
-            Log.i(TAG, "Finished DB copy from assets");
         } finally {
             if (in  != null) in.close();
             if (out != null) out.close();
-            Log.i(TAG, "closed streams");
+            listener.completed();
         }
     }
+
+
 
 
 
@@ -191,14 +188,7 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Check to see whether the database has already been deployed; if not, we must copy it over from assets
-          if (!DEPLOYED_DB_FILE.exists()){
-              try {
-                  deployDB();
-              } catch (IOException e) {
-                  throw new RuntimeException(e);
-              }
-          }
+        // see #deployDB(InstallationListener)
     }
 
     /**
@@ -227,20 +217,10 @@ public class DBHelper extends SQLiteOpenHelper {
      * @throws SQLException on error
      */
     public void open() throws SQLException {
-        Log.i(TAG, "open()");
         if (DEPLOYED_DB_FILE.exists()){
-            Log.i(TAG, "DB already deployed");
             verbaDB = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
-            Log.i(TAG, "DB opened");
         } else {
-            try {
-                deployDB();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            Log.i(TAG, "DB deployed from assets, now attempting to open");
-            verbaDB = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
-            Log.i(TAG, "DB opened after copy from assets");
+            throw new IllegalStateException("One-time database deployment has not been carried out! First call deployDB(ProgressListener)");
         }
     }
 

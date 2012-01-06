@@ -7,24 +7,41 @@ The sister project for desktop is:[Verba-Console](http://magnopere.org/#verba-co
 
 ## Features
 
-- look up a word using any inflectional form of that word
-- remembers frequently looked-up words, making them available for review and study
-- lookup Widget
-- lookup service
+- look up a word using any inflectional form of that word, e.g. identifies `arma` to one of:
+
+
+        - noun nom neut pl
+	    - noun voc neut pl
+	    - noun acc neut pl
+	    - verb second person sg pres imperat act
+and leads in the first three cases to the definition of the noun, and in the last case the definition of the verb.
+
+- complete offline access to the entire [An Elementary Latin Dictionary (1895)](http://www.archive.org/details/anelementarylat01lewigoog)
+by Charlton T. Lewis.
+
 
 ## License
 [GPL v3](http://www.gnu.org/licenses/)
 
-## Source and pre-built binaries
+## Source
+[https://github.com/grantham/verba-android](https://github.com/grantham/verba-android)
 
 ## Prerequisites
+- maven 3
+- android SDK
 
 ## Building
 
-## Installing
+    $mvn clean install
 
-### From source:
+## Device Installation
+Presently the apk is about 25M. But, you will need an additional 89M since the application decompresses a SQLite
+database on initial use/setup.
 
-### From pre-built binaries
+## TODOs / New Features
 
-## Running
+- *HIGH* remember frequently looked-up words, making them available for review and study
+- *HIGH* reduce space requirements (perhaps winnow the DB's morphology table, removing all enclitic entries)
+- *HIGH* send input from keyboard (don't require clicking the button under the text input box)
+- lookup service
+- lookup Widget

@@ -22,9 +22,12 @@
 package org.magnopere.verba.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -35,7 +38,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import org.magnopere.verba.R;
 import org.magnopere.verba.data.Analysis;
+import org.magnopere.verba.data.DBConstants;
 import org.magnopere.verba.data.DBHelper;
+
+import java.sql.SQLException;
 
 public class LookupActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -49,6 +55,35 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
 
     private DBHelper                dbHelper;
     private MenuHandler             menuHandler;
+
+
+    private void deployDB(){
+        if (!DBConstants.DEPLOYED_DB_FILE.exists()){
+            final ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setOwnerActivity(this);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setTitle("Completing installation...");
+            dialog.setMessage("Please wait while the dictionary is made ready for first use.");
+            dialog.setCancelable(false);
+            dialog.show();
+            new InstallationThread(dbHelper, new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    int progress = msg.arg1;
+                    dialog.setProgress(progress);
+                    if (progress >= 100){
+                     //   dialog.setIndeterminate(true);
+                     //   dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        dialog.setMessage("Finishing up...");
+                    }
+                    if (msg.arg2 == Integer.MAX_VALUE){
+                        dialog.dismiss();
+                    }
+                }
+            }).start();
+        }
+    }
+
 
     /**
      * Called when the activity is first created.
@@ -72,6 +107,7 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
         entryAdapter    = new ArrayAdapter<Analysis>(this, R.layout.candidate_entry_list);
         candidateList.setAdapter(entryAdapter);
         candidateList.setOnItemClickListener(this);
+        deployDB();
     }
 
 
