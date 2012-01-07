@@ -30,7 +30,7 @@ import java.io.File;
 public interface DBConstants {
 
     int    BUF_SIZE            = 1024;
-    int    DEFLATED_DB_SIZE_BYTES = 93223936;
+    double DEFLATED_DB_SIZE_BYTES = 93223936.0D;
     String DB_NAME             = "verba.db";
     String DB_ASSET_NAME       = "verba.jpg";
     String DB_PATH             = "/data/data/org.magnopere.verba/databases/";

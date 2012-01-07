@@ -21,12 +21,14 @@
 
 package org.magnopere.verba.activity;
 
-import android.app.ProgressDialog;
-import android.os.Handler;
+import android.app.Activity;
 import android.os.Message;
 import org.magnopere.verba.data.DBHelper;
 
 /**
+ * Used to copy/decompress the database stored in /assets/verba.jpg and communicate progress information
+ * to the progress dialog owned by {@linkplain LookupActivity}
+ *
  * @author Roger Grantham
  * @since 1/5/12
  */
@@ -34,10 +36,10 @@ public class InstallationThread extends Thread {
 
     private static final int MAX_PROGRESS = 100;
 
-    private final Handler           handler;
-    private final DBHelper          dbHelper;
+    private final InstallationDialogHandler handler;
+    private final DBHelper                  dbHelper;
 
-    public InstallationThread(DBHelper dbHelper, Handler handler) {
+    public InstallationThread(DBHelper dbHelper, InstallationDialogHandler handler) {
         this.dbHelper = dbHelper;
         this.handler = handler;
     }
@@ -54,16 +56,33 @@ public class InstallationThread extends Thread {
 
             public void progress(double percentCompleted) {
                 Message msg = handler.obtainMessage();
+                msg.what = InstallationDialogHandler.PROGRESS_MSG;
                 msg.arg1 = (int)Math.round(percentCompleted * MAX_PROGRESS);
                 handler.sendMessage(msg);
             }
 
             public void completed() {
                 Message msg = handler.obtainMessage();
+                msg.what = InstallationDialogHandler.PROGRESS_MSG;
                 msg.arg1 = MAX_PROGRESS;
                 msg.arg2 = Integer.MAX_VALUE;
                 handler.sendMessage(msg);
             }
+            
+            public void insufficientSpace(int requiredBytes, int foundBytes){
+                Message msg = handler.obtainMessage();
+                msg.what = InstallationDialogHandler.INSUFFICIENT_SPACE_ERROR;
+                msg.arg1 = requiredBytes;
+                msg.arg2 = foundBytes;
+                handler.sendMessageAtFrontOfQueue(msg);
+                try {
+                    Thread.sleep(6000L);
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+                throw new IllegalStateException("Installation failed.");
+            }
+            
         });
         } catch (Exception e){
             throw new RuntimeException(e);

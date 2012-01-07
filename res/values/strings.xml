@@ -27,15 +27,28 @@
     <string name="search">mē docē</string>
     <string name="clear">dele tabellam</string>
     <string name="resourceNotFound">mē paenitet, nam nūllum inuentum est.</string>
-    <string name="about_label">de uerbis</string>
+    <string name="progressTitle">Completing installation...</string>
+    <string name="progressMessage">Please wait while the dictionary is made ready for first use.</string>
+    <string name="progressCompletingMessage">Finishing up...</string>
+    <string name="insufficientStorageMessage">Insufficient storage for dictionary: required %1$d bytes, but found only %2$d bytes</string>
+    <string name="about_label">About</string>
     <string name="about">
-        This little application is greatly indebted to the free/libre software and data contributed by the Perseus project. In the same spirit of openness I hope that verba-android can be of use to others.
+        This little application is greatly indebted to the free/libre software and data contributed by the Perseus project.\n
+        I wrote this app to satisfy a personal need, but I hope that verba-android can be of use to others.\n
+        This is beta-quality software; please report issues and feature requests here: \n
+        https://github.com/grantham/verba-android/issues\n\n
+        <em>Hacking is <strong>strongly encouraged</strong></em>:\n
         Source is available from https://github.com/grantham/verba-android. Hack away!
     </string>
 
     <string name="contribute_label">Hack</string>
     <string name="contribute">
-       Hack away! Source is available from https://github.com/grantham/verba-android
+       Hack away! Source is available from https://github.com/grantham/verba-android \n
+       Planned features for later releases:\n
+        * Keep a list of words looked up five or more times to be exported as flash cards\n
+        * Reduce storage requirements while still providing off-line use\n
+        * Provide a service for other applications to use for part-of-speech tagging and general word lookup\n
+        * Other ideas suggested by users and hackers.
     </string>
     <string name="about_licensing_label">Licensing</string>
     <string name="about_licensing">

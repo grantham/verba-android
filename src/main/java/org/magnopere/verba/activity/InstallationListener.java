@@ -31,5 +31,5 @@ public interface InstallationListener {
     void started();
     void progress(double percentCompleted);
     void completed();
-
+    void insufficientSpace(int requiredBytes, int foundBytes);
 }

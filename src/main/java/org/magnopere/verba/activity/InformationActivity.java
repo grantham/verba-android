@@ -23,10 +23,7 @@ package org.magnopere.verba.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -45,7 +42,6 @@ public class InformationActivity extends Activity {
     
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
         menuHandler = new MenuHandler(this);
         setContentView(R.layout.information);
         final int infoTextID = getIntent().getIntExtra(MENU_ITEM_ID, R.id.about_menu_item);

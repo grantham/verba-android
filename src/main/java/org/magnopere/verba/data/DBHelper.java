@@ -27,7 +27,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.StatFs;
-import android.util.Log;
 import org.magnopere.verba.activity.InstallationListener;
 
 import java.io.*;
@@ -43,8 +42,8 @@ import static org.magnopere.verba.data.Orthography.*;
  * Facade to the database. <p>
  * <strong>NOTA BENE:</strong> after the APK is installed, the first time it is run, the database must be
  * unpacked from <code>/assets/verba.jpg</code>. Note that <code>/assets/verba.jpg</code> is, in fact a gzipped
- * SQLite database file! The file extension is a hack to get around a limitation of being able to only unpack <1MB of
- * non-image data from <code>/assets</code><p>
+ * SQLite database file! The file extension is a hack to get around a limitation of being able to only unpack &lt; 1MB
+ * of non-image data from <code>/assets</code><p>
  * See also {@linkplain #deployDB(InstallationListener)}
  * @author Roger Grantham
  * @since 12/31/11
@@ -67,6 +66,13 @@ public class DBHelper extends SQLiteOpenHelper {
     private void checkDBIsOpen(){
         if (verbaDB == null || !verbaDB.isOpen()) throw new IllegalStateException("Verba DB is not open.");
     }
+
+
+    public static double calculateAvailableBytes(File path) {
+        final StatFs statFs = new StatFs(path.getPath());
+        return statFs.getBlockSize() * statFs.getAvailableBlocks();
+    }
+
     
     @Override
     public synchronized void close() {
@@ -79,17 +85,29 @@ public class DBHelper extends SQLiteOpenHelper {
 
     /**
      * Deploys the DB from the assets location
+     * @param listener receives deployment progress information
      * @throws IOException on error
      */
     public void deployDB(InstallationListener listener) throws IOException {
-        if (DBConstants.DEPLOYED_DB_FILE.exists()) return;
-        listener.started();
-        final SQLiteDatabase tmp = getReadableDatabase();
-        final String dbPath = tmp.getPath();
-        tmp.close();
+        if (DBConstants.DEPLOYED_DB_FILE.exists()){
+            return;
+        }
         GZIPInputStream in = null;
         OutputStream    out = null;
+        SQLiteDatabase tmp = null;
         try {
+            tmp = getReadableDatabase();
+            final String dbPath = tmp.getPath();
+            final double availableBytes = calculateAvailableBytes(new File(dbPath));
+            if (availableBytes < DEFLATED_DB_SIZE_BYTES){
+                if (DBConstants.DEPLOYED_DB_FILE.exists()){
+                    DBConstants.DEPLOYED_DB_FILE.delete();
+                }
+                listener.insufficientSpace((int)DEFLATED_DB_SIZE_BYTES, (int)availableBytes);
+                return;
+            }
+            tmp.close();
+            listener.started();
             final AssetManager assetManager = context.getResources().getAssets();
             in  = new GZIPInputStream(assetManager.open(DB_ASSET_NAME, AssetManager.ACCESS_STREAMING));
             out = new FileOutputStream(dbPath);
@@ -98,25 +116,22 @@ public class DBHelper extends SQLiteOpenHelper {
             for (int read = in.read(buf), i = 0; read > 0; read = in.read(buf), i++){
                 out.write(buf, 0, read);
                 totalBytesRead += read;
-                if (i % 100 == 0){
-                    listener.progress(Math.min((double)totalBytesRead / (double)DEFLATED_DB_SIZE_BYTES, 1.0D));
+                if (i % 100 == 0){ // parsimonious progress updating for performance (reduce synchronization)
+                    listener.progress(Math.min((double)totalBytesRead / DEFLATED_DB_SIZE_BYTES, 1.0D));
                 }
             }
             out.flush();
         } finally {
             if (in  != null) in.close();
             if (out != null) out.close();
+            if (tmp != null) tmp.close();
             listener.completed();
         }
     }
 
 
-
-
-
     public Cursor lookupAnalyses(String wordForm) throws SQLException {
         checkDBIsOpen();
-        Log.i(TAG, "DB is open, beginning query for morphology analyses of form " + wordForm);
         //"SELECT form, lemma, grammaticalCase, degree, gender, mood, number, person, pos, tense, voice FROM morphology WHERE form = ?"
         return verbaDB.query(MORPHOLOGY_TABLE,
                             MORPHOLOGY_FIELDS,
@@ -126,12 +141,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public List<Analysis> findAnalyses(String wordForm){
         final String rectfiedForm = rectify(wordForm);
-        Log.i(TAG, "Looking for " + rectfiedForm);
         final List<Analysis> analyses = new ArrayList<Analysis>();
         try {
             open();
             final Cursor cursor = lookupAnalyses(rectfiedForm);
-            Log.i(TAG, "cursor returned for morph analysis query for " + rectfiedForm);
             final int rows = cursor.getCount();
             for (int i = 0; i < rows; i++){
                 cursor.moveToPosition(i);
@@ -208,7 +221,8 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO: implement
+        // Note that we will have to manage this ourselves since we are using an
+        // existing database, largely unmanaged by the Android API
     }
 
 

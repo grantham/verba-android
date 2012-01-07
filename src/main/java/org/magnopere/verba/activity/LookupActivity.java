@@ -29,9 +29,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -41,9 +39,8 @@ import org.magnopere.verba.data.Analysis;
 import org.magnopere.verba.data.DBConstants;
 import org.magnopere.verba.data.DBHelper;
 
-import java.sql.SQLException;
 
-public class LookupActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class LookupActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, Thread.UncaughtExceptionHandler {
 
     private static final String TAG = LookupActivity.class.getSimpleName();
 
@@ -62,28 +59,23 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
             final ProgressDialog dialog = new ProgressDialog(this);
             dialog.setOwnerActivity(this);
             dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setTitle("Completing installation...");
-            dialog.setMessage("Please wait while the dictionary is made ready for first use.");
+            dialog.setTitle(getString(R.string.progressTitle));
+            dialog.setMessage(getString(R.string.progressMessage));
             dialog.setCancelable(false);
             dialog.show();
-            new InstallationThread(dbHelper, new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-                    int progress = msg.arg1;
-                    dialog.setProgress(progress);
-                    if (progress >= 100){
-                     //   dialog.setIndeterminate(true);
-                     //   dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                        dialog.setMessage("Finishing up...");
-                    }
-                    if (msg.arg2 == Integer.MAX_VALUE){
-                        dialog.dismiss();
-                    }
-                }
-            }).start();
+            final Thread installer = new InstallationThread(dbHelper,
+                                        new InstallationDialogHandler(getString(R.string.progressCompletingMessage),
+                                                                    getString(R.string.insufficientStorageMessage),
+                                                                    dialog));
+            installer.setUncaughtExceptionHandler(this);
+            installer.start();
         }
     }
 
+
+    public void uncaughtException(Thread thread, Throwable throwable) {
+        finish();
+    }
 
     /**
      * Called when the activity is first created.
@@ -94,7 +86,6 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		Log.i(TAG, "onCreate");
         setContentView(R.layout.main);
         dbHelper        = new DBHelper(this);
         menuHandler     = new MenuHandler(this);
