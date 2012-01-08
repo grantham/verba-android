@@ -19,7 +19,7 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.activity;
+package org.magnopere.verba.android.activity;
 
 import android.app.Activity;
 import android.os.Bundle;

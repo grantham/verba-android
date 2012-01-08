@@ -19,7 +19,7 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.data;
+package org.magnopere.verba.android.data;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -27,7 +27,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.StatFs;
-import org.magnopere.verba.activity.InstallationListener;
+import org.magnopere.verba.android.activity.InstallationListener;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import static org.magnopere.verba.data.DBConstants.*;
-import static org.magnopere.verba.data.Orthography.*;
+import static org.magnopere.verba.android.data.DBConstants.*;
+import static org.magnopere.verba.android.data.Orthography.*;
 
 /**
  * Facade to the database. <p>

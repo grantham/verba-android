@@ -19,10 +19,9 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.activity;
+package org.magnopere.verba.android.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;

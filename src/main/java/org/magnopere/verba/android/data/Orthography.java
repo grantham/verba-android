@@ -19,7 +19,7 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.data;
+package org.magnopere.verba.android.data;
 
 /**
  * @author Roger Grantham

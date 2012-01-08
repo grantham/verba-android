@@ -19,9 +19,8 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.activity;
+package org.magnopere.verba.android.activity;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Message;

@@ -19,11 +19,10 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.activity;
+package org.magnopere.verba.android.activity;
 
-import android.app.Activity;
 import android.os.Message;
-import org.magnopere.verba.data.DBHelper;
+import org.magnopere.verba.android.data.DBHelper;
 
 /**
  * Used to copy/decompress the database stored in /assets/verba.jpg and communicate progress information

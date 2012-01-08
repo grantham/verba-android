@@ -19,7 +19,7 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.data;
+package org.magnopere.verba.android.data;
 
 import android.database.Cursor;
 
@@ -28,8 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.zip.GZIPInputStream;
-import static org.magnopere.verba.data.DBConstants.BUF_SIZE;
-import static org.magnopere.verba.data.Orthography.*;
+import static org.magnopere.verba.android.data.DBConstants.BUF_SIZE;
+import static org.magnopere.verba.android.data.Orthography.*;
 
 /**
  * Represents an entry in the lexicon

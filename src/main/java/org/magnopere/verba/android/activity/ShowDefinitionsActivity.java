@@ -19,7 +19,7 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.activity;
+package org.magnopere.verba.android.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -30,8 +30,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import org.magnopere.verba.R;
-import org.magnopere.verba.data.DBHelper;
-import org.magnopere.verba.data.Entry;
+import org.magnopere.verba.android.data.DBHelper;
+import org.magnopere.verba.android.data.Entry;
 
 import java.util.List;
 

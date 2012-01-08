@@ -19,15 +19,13 @@
  * along with Verba-Android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.magnopere.verba.activity;
+package org.magnopere.verba.android.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,9 +33,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import org.magnopere.verba.R;
-import org.magnopere.verba.data.Analysis;
-import org.magnopere.verba.data.DBConstants;
-import org.magnopere.verba.data.DBHelper;
+import org.magnopere.verba.android.data.Analysis;
+import org.magnopere.verba.android.data.DBConstants;
+import org.magnopere.verba.android.data.DBHelper;
 
 
 public class LookupActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, Thread.UncaughtExceptionHandler {
