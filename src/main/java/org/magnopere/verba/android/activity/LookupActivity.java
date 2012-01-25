@@ -38,7 +38,7 @@ import org.magnopere.verba.android.data.DBConstants;
 import org.magnopere.verba.android.data.DBHelper;
 
 
-public class LookupActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, Thread.UncaughtExceptionHandler {
+public class LookupActivity extends QueryActivity implements View.OnClickListener, AdapterView.OnItemClickListener, Thread.UncaughtExceptionHandler {
 
     private static final String TAG = LookupActivity.class.getSimpleName();
 
@@ -53,7 +53,7 @@ public class LookupActivity extends Activity implements View.OnClickListener, Ad
 
 
     private void deployDB(){
-        if (!DBConstants.DEPLOYED_DB_FILE.exists()){
+        if (!getDatabasePath(DBConstants.LEXICON_DB_NAME).exists()){
             final ProgressDialog dialog = new ProgressDialog(this);
             dialog.setOwnerActivity(this);
             dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);

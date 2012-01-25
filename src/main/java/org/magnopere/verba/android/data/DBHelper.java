@@ -57,7 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     
     public DBHelper(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+        super(context, LEXICON_DB_NAME, null, DB_VERSION);
         this.context = context;
     }
 
@@ -89,28 +89,31 @@ public class DBHelper extends SQLiteOpenHelper {
      * @throws IOException on error
      */
     public void deployDB(InstallationListener listener) throws IOException {
-        if (DBConstants.DEPLOYED_DB_FILE.exists()){
+        
+        final File databasePath = context.getDatabasePath(DBConstants.LEXICON_DB_NAME);
+        
+        if (databasePath.exists()){
             return;
+        } else {
+            
+            if (databasePath.getParentFile().mkdirs()){
+                databasePath.createNewFile();
+            } else {
+                throw new FileNotFoundException("Cannot create the lexicon database.");
+            }
         }
         GZIPInputStream in = null;
         OutputStream    out = null;
-        SQLiteDatabase tmp = null;
         try {
-            tmp = getReadableDatabase();
-            final String dbPath = tmp.getPath();
-            final double availableBytes = calculateAvailableBytes(new File(dbPath));
+            final double availableBytes = calculateAvailableBytes(databasePath);
             if (availableBytes < DEFLATED_DB_SIZE_BYTES){
-                if (DBConstants.DEPLOYED_DB_FILE.exists()){
-                    DBConstants.DEPLOYED_DB_FILE.delete();
-                }
                 listener.insufficientSpace((int)DEFLATED_DB_SIZE_BYTES, (int)availableBytes);
                 return;
             }
-            tmp.close();
             listener.started();
             final AssetManager assetManager = context.getResources().getAssets();
             in  = new GZIPInputStream(assetManager.open(DB_ASSET_NAME, AssetManager.ACCESS_STREAMING));
-            out = new FileOutputStream(dbPath);
+            out = new FileOutputStream(databasePath);
             byte[] buf = new byte[BUF_SIZE];
             int totalBytesRead = 0;
             for (int read = in.read(buf), i = 0; read > 0; read = in.read(buf), i++){
@@ -124,7 +127,6 @@ public class DBHelper extends SQLiteOpenHelper {
         } finally {
             if (in  != null) in.close();
             if (out != null) out.close();
-            if (tmp != null) tmp.close();
             listener.completed();
         }
     }
@@ -231,8 +233,9 @@ public class DBHelper extends SQLiteOpenHelper {
      * @throws SQLException on error
      */
     public void open() throws SQLException {
-        if (DEPLOYED_DB_FILE.exists()){
-            verbaDB = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+        final File dbPath = context.getDatabasePath(LEXICON_DB_NAME);
+        if (dbPath.exists()){
+            verbaDB = SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
         } else {
             throw new IllegalStateException("One-time database deployment has not been carried out! First call deployDB(ProgressListener)");
         }

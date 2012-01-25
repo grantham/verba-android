@@ -21,8 +21,6 @@
 
 package org.magnopere.verba.android.data;
 
-import java.io.File;
-
 /**
  * @author Roger Grantham
  * @since 1/1/12
@@ -31,14 +29,13 @@ public interface DBConstants {
 
     int    BUF_SIZE            = 1024;
     double DEFLATED_DB_SIZE_BYTES = 93223936.0D;
-    String DB_NAME             = "verba.db";
-    String DB_ASSET_NAME       = "verba.jpg";
-    String DB_PATH             = "/data/data/org.magnopere.verba/databases/";
-    int    DB_VERSION          = 1;
+    String LEXICON_DB_NAME      = "verba.db";
+    String DB_ASSET_NAME        = "verba.jpg";
+    int    DB_VERSION           = 1;
 
-    String MORPHOLOGY_TABLE    = "morphology";
-    String[] MORPHOLOGY_FIELDS = new String[]{"form", "lemma", "grammaticalCase", "degree", "gender", "mood", "number", "person", "pos", "tense", "voice"};
-    String LEXICON_TABLE       = "lexicon";
-    String[] LEXICON_FIELDS    = new String[]{"lemma", "ordinality", "orthography", "endings", "gender", "pos", "definition"};
-    File DEPLOYED_DB_FILE    = new File(DB_PATH + DB_NAME);
+    String MORPHOLOGY_TABLE     = "morphology";
+    String[] MORPHOLOGY_FIELDS  = new String[]{"form", "lemma", "grammaticalCase", "degree", "gender", "mood", "number", "person", "pos", "tense", "voice"};
+    String LEXICON_TABLE        = "lexicon";
+    String[] LEXICON_FIELDS     = new String[]{"lemma", "ordinality", "orthography", "endings", "gender", "pos", "definition"};
+
 }

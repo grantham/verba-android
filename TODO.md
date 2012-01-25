@@ -1,3 +1,2 @@
 # TODO
-- make application screenshots
-- upload [draft to Google market](http://support.google.com/androidmarket/developer/bin/answer.py?hl=en&answer=113469)
+- add a dialogue on first use of app to ask user where to unpack the database.

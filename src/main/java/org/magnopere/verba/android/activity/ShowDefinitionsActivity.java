@@ -40,7 +40,7 @@ import java.util.List;
  * @author Roger Grantham
  * @since 1/2/12
  */
-public class ShowDefinitionsActivity extends Activity {
+public class ShowDefinitionsActivity extends QueryActivity {
     
     public  static final String ANALYSIS_LEMMA  = "ANALYSIS_LEMMA";
     private static final String TAG             = ShowDefinitionsActivity.class.getSimpleName();

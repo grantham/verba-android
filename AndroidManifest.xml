@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.magnopere.verba"
     android:versionCode="1"
-    android:versionName="1.0-BETA"
+    android:versionName="1.1-BETA"
     android:installLocation="preferExternal">
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="8" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".android.activity.LookupActivity">
             <intent-filter>
@@ -14,7 +15,7 @@
         </activity>
         <activity android:name=".android.activity.ShowDefinitionsActivity"/>
         <activity android:name=".android.activity.InformationActivity"/>
+        <activity android:name=".android.activity.QueryActivity" android:label="QueryActivity"/>
     </application>
-
 </manifest>
 
