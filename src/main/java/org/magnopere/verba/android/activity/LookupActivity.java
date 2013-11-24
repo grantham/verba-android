@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012 Roger Grantham
  *
  * All rights reserved.
@@ -21,7 +21,6 @@
 
 package org.magnopere.verba.android.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -31,144 +30,154 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import org.magnopere.verba.R;
 import org.magnopere.verba.android.data.Analysis;
 import org.magnopere.verba.android.data.DBConstants;
 import org.magnopere.verba.android.data.DBHelper;
 
-
-public class LookupActivity extends QueryActivity implements View.OnClickListener, AdapterView.OnItemClickListener, Thread.UncaughtExceptionHandler {
-
-    private static final String TAG = LookupActivity.class.getSimpleName();
+import java.io.File;
 
 
-    private EditText                searchBox;
-    private Button                  searchButton;
-    private ListView                candidateList;
-    private ArrayAdapter<Analysis>  entryAdapter;
+public class LookupActivity extends QueryActivity implements Thread.UncaughtExceptionHandler {
 
-    private DBHelper                dbHelper;
-    private MenuHandler             menuHandler;
+	private static final String TAG = LookupActivity.class.getSimpleName();
 
 
-    private void deployDB(){
-        if (!getDatabasePath(DBConstants.LEXICON_DB_NAME).exists()){
-            final ProgressDialog dialog = new ProgressDialog(this);
-            dialog.setOwnerActivity(this);
-            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setTitle(getString(R.string.progressTitle));
-            dialog.setMessage(getString(R.string.progressMessage));
-            dialog.setCancelable(false);
-            dialog.show();
-            final Thread installer = new InstallationThread(dbHelper,
-                                        new InstallationDialogHandler(getString(R.string.progressCompletingMessage),
-                                                                    getString(R.string.insufficientStorageMessage),
-                                                                    dialog));
-            installer.setUncaughtExceptionHandler(this);
-            installer.start();
-        }
-    }
+	private ListView               candidateList;
+	private DBHelper               dbHelper;
+	private ArrayAdapter<Analysis> entryAdapter;
+	private MenuHandler            menuHandler;
+	private EditText               searchBox;
+	private Button                 searchButton;
 
 
-    public void uncaughtException(Thread thread, Throwable throwable) {
-        finish();
-    }
+	private void deployDB() {
+		// TODO:  perform a simple query to prove the DB has been properly installed?
+		final File dbFile = getDatabasePath(DBConstants.LEXICON_DB_NAME);
+		if (!dbFile.exists() || dbFile.length() < 1024) {
+			// delete invalid db files
+			dbFile.delete();
 
-    /**
-     * Called when the activity is first created.
-     * @param savedInstanceState If the activity is being re-initialized after 
-     * previously being shut down then this Bundle contains the data it most 
-     * recently supplied in onSaveInstanceState(Bundle). <b>Note: Otherwise it is null.</b>
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        dbHelper        = new DBHelper(this);
-        menuHandler     = new MenuHandler(this);
-        searchBox       = (EditText)findViewById(R.id.search_EditText);
-        searchBox.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        searchBox.setOnClickListener(this);
-        searchButton    = (Button)findViewById(R.id.search_Button);
-        searchButton.setOnClickListener(this);
-        candidateList   = (ListView)findViewById(R.id.candidateEntries_ListView);
-        entryAdapter    = new ArrayAdapter<Analysis>(this, R.layout.candidate_entry_list);
-        candidateList.setAdapter(entryAdapter);
-        candidateList.setOnItemClickListener(this);
-        deployDB();
-    }
+			final ProgressDialog dialog = new ProgressDialog(this);
+			dialog.setOwnerActivity(this);
+			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			dialog.setTitle(getString(R.string.progressTitle));
+			dialog.setMessage(getString(R.string.progressMessage));
+			dialog.setCancelable(false);
+			dialog.show();
+			final Thread installer = new InstallationThread(dbHelper,
+					new InstallationDialogHandler(getString(R.string.progressCompletingMessage),
+							getString(R.string.insufficientStorageMessage),
+							dialog));
+			installer.setUncaughtExceptionHandler(this);
+			installer.start();
+		}
+	}
 
 
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
-    public void onClick(View v) {
-        final int id = v.getId();
-        switch (id){
-            case R.id.search_EditText:
-                searchBoxClicked((EditText)v);
-                break;
-            case R.id.search_Button:
-                searchButtonClicked((Button)v);
-                break;
-            default: // no op
-        }    
-    }
+	/**
+	 * Method to be invoked when an item in this AdapterView has been clicked.
+	 * <p/>
+	 * Implementers can call getItemAtPosition(position) if they need
+	 * to access the data associated with the selected item.
+	 *
+	 * @param position The position of the view in the adapter.
+	 */
+
+	public void itemSelected(int position) {
+		final Analysis analysis = entryAdapter.getItem(position);
+		final Intent showDefinitions = new Intent(this, ShowDefinitionsActivity.class);
+		showDefinitions.putExtra(ShowDefinitionsActivity.ANALYSIS_LEMMA, analysis.getLemma());
+		startActivity(showDefinitions);
+	}
 
 
-    /**
-     * Callback method to be invoked when an item in this AdapterView has
-     * been clicked.
-     * <p/>
-     * Implementers can call getItemAtPosition(position) if they need
-     * to access the data associated with the selected item.
-     *
-     * @param parent   The AdapterView where the click happened.
-     * @param view     The view within the AdapterView that was clicked (this
-     *                 will be a view provided by the adapter)
-     * @param position The position of the view in the adapter.
-     * @param id       The row id of the item that was clicked.
-     */
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final Analysis analysis = entryAdapter.getItem(position);
-        final Intent showDefinitions = new Intent(this, ShowDefinitionsActivity.class);
-        showDefinitions.putExtra(ShowDefinitionsActivity.ANALYSIS_LEMMA, analysis.getLemma());
-        startActivity(showDefinitions);
-    }
+	/**
+	 * Called when the activity is first created.
+	 *
+	 * @param savedInstanceState If the activity is being re-initialized after
+	 *                           previously being shut down then this Bundle contains the data it most
+	 *                           recently supplied in onSaveInstanceState(Bundle). <b>Note: Otherwise it is null.</b>
+	 */
 
-    private void searchBoxClicked(EditText searchBox){
-        searchBox.getText().clear();
-        entryAdapter.clear();
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    private void searchButtonClicked(Button searchButton){
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchBox.getWindowToken(), 0);
-        final String searchInput = searchBox.getText().toString().trim().toLowerCase();
-        entryAdapter.clear();
-        final String[] tokens = searchInput.split("\\s+");
-        for (String token: tokens){
-            for (Analysis analysis: dbHelper.findAnalyses(token)){
-                entryAdapter.add(analysis);
-            }
-        }
-    }
+		setContentView(R.layout.main);
+		dbHelper = new DBHelper(this);
+		menuHandler = new MenuHandler(this);
+
+		searchBox = (EditText) findViewById(R.id.search_EditText);
+		searchBox.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		searchBox.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				searchBoxClicked((EditText) v);
+			}
+		});
+
+		searchButton = (Button) findViewById(R.id.search_Button);
+		searchButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				searchButtonClicked();
+			}
+		});
+
+		candidateList = (ListView) findViewById(R.id.candidateEntries_ListView);
+		entryAdapter = new ArrayAdapter<Analysis>(this, R.layout.candidate_entry_list);
+		candidateList.setAdapter(entryAdapter);
+		candidateList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				itemSelected(position);
+			}
+		});
+
+		// ensure DB is properly deployed
+		deployDB();
+	}
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return menuHandler.performOnCreateOptionsMenu(menu);
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return menuHandler.performOnCreateOptionsMenu(menu);
+	}
 
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return menuHandler.performOnOptionsItemSelected(item);
-    }
-    
-    
-    
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return menuHandler.performOnOptionsItemSelected(item);
+	}
+
+
+	private void searchBoxClicked(EditText searchBox) {
+		searchBox.getText().clear();
+		entryAdapter.clear();
+	}
+
+
+	private void searchButtonClicked() {
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(searchBox.getWindowToken(), 0);
+		final String searchInput = searchBox.getText().toString().trim().toLowerCase();
+		entryAdapter.clear();
+		final String[] tokens = searchInput.split("\\s+");
+		for (String token : tokens) {
+			for (Analysis analysis : dbHelper.findAnalyses(token)) {
+				entryAdapter.add(analysis);
+			}
+		}
+	}
+
+
+	public void uncaughtException(Thread thread, Throwable throwable) {
+		finish();
+	}
 }
-
