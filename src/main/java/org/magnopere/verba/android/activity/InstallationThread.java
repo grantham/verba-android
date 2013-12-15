@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012 Roger Grantham
  *  
  * All rights reserved.
@@ -33,58 +33,62 @@ import org.magnopere.verba.android.data.DBHelper;
  */
 public class InstallationThread extends Thread {
 
-    private static final int MAX_PROGRESS = 100;
+	private static final int MAX_PROGRESS = 100;
 
-    private final InstallationDialogHandler handler;
-    private final DBHelper                  dbHelper;
+	private final DBHelper                  dbHelper;
+	private final InstallationDialogHandler handler;
 
-    public InstallationThread(DBHelper dbHelper, InstallationDialogHandler handler) {
-        this.dbHelper = dbHelper;
-        this.handler = handler;
-    }
 
-    @Override
-    public void run() {
-        try {
-        dbHelper.deployDB(new InstallationListener() {
-            public void started() {
-                Message msg = handler.obtainMessage();
-                msg.arg1 = 0;
-                handler.sendMessage(msg);
-            }
+	public InstallationThread(DBHelper dbHelper, InstallationDialogHandler handler) {
+		this.dbHelper = dbHelper;
+		this.handler = handler;
+	}
 
-            public void progress(double percentCompleted) {
-                Message msg = handler.obtainMessage();
-                msg.what = InstallationDialogHandler.PROGRESS_MSG;
-                msg.arg1 = (int)Math.round(percentCompleted * MAX_PROGRESS);
-                handler.sendMessage(msg);
-            }
 
-            public void completed() {
-                Message msg = handler.obtainMessage();
-                msg.what = InstallationDialogHandler.PROGRESS_MSG;
-                msg.arg1 = MAX_PROGRESS;
-                msg.arg2 = Integer.MAX_VALUE;
-                handler.sendMessage(msg);
-            }
-            
-            public void insufficientSpace(int requiredBytes, int foundBytes){
-                Message msg = handler.obtainMessage();
-                msg.what = InstallationDialogHandler.INSUFFICIENT_SPACE_ERROR;
-                msg.arg1 = requiredBytes;
-                msg.arg2 = foundBytes;
-                handler.sendMessageAtFrontOfQueue(msg);
-                try {
-                    Thread.sleep(6000L);
-                } catch (InterruptedException e) {
-                    // ignore
-                }
-                throw new IllegalStateException("Installation failed.");
-            }
-            
-        });
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
-    }
+	@Override
+	public void run() {
+		try {
+			final InstallationListener installListener = new InstallationListener() {
+				public void started() {
+					Message msg = handler.obtainMessage();
+					msg.arg1 = 0;
+					handler.sendMessage(msg);
+				}
+
+				public void progress(double percentCompleted) {
+					Message msg = handler.obtainMessage();
+					msg.what = InstallationDialogHandler.PROGRESS_MSG;
+					msg.arg1 = (int) Math.round(percentCompleted * MAX_PROGRESS);
+					handler.sendMessage(msg);
+				}
+
+				public void completed() {
+					Message msg = handler.obtainMessage();
+					msg.what = InstallationDialogHandler.PROGRESS_MSG;
+					msg.arg1 = MAX_PROGRESS;
+					msg.arg2 = Integer.MAX_VALUE;
+					handler.sendMessage(msg);
+				}
+
+				public void insufficientSpace(int requiredBytes, int foundBytes) {
+					Message msg = handler.obtainMessage();
+					msg.what = InstallationDialogHandler.INSUFFICIENT_SPACE_ERROR;
+					msg.arg1 = requiredBytes;
+					msg.arg2 = foundBytes;
+					handler.sendMessageAtFrontOfQueue(msg);
+					try {
+						Thread.sleep(6000L);
+					} catch (InterruptedException e) {
+						// ignore
+					}
+					throw new IllegalStateException("Installation failed.");
+				}
+
+			};
+
+			dbHelper.deployDB(installListener);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
