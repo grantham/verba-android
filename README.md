@@ -42,6 +42,5 @@ database on initial use/setup.
 
 - *HIGH* remember frequently looked-up words, making them available for review and study
 - *HIGH* reduce space requirements (perhaps winnow the DB's morphology table, removing all enclitic entries)
-- *HIGH* send input from keyboard (don't require clicking the button under the text input box)
 - lookup service
 - lookup Widget
