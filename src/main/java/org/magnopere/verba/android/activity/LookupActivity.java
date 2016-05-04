@@ -29,7 +29,10 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.KeyEvent;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -119,6 +122,20 @@ public class LookupActivity extends QueryActivity implements Thread.UncaughtExce
 			@Override
 			public void onClick(View v) {
 				searchBoxClicked((EditText) v);
+			}
+		});
+
+		searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				boolean handled = false;
+				if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+						(actionId==EditorInfo.IME_NULL &&
+						 event.getAction()==KeyEvent.ACTION_DOWN)) {
+					handled = true;
+					searchButtonClicked();
+				}
+					return handled;
 			}
 		});
 

@@ -36,7 +36,7 @@
             android:gravity="top"
             android:background="#cfff"
             android:inputType="textNoSuggestions"
-            android:imeOptions="actionDone|actionGo|actionSend|actionSearch"
+            android:imeOptions="actionSearch"
             android:autoText="false"/>
 
     <Button android:id="@+id/search_Button"
